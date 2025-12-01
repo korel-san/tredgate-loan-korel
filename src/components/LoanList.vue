@@ -105,6 +105,7 @@ function formatDate(isoDate: string): string {
                 class="action-btn danger"
                 @click="handleDelete(loan.id)"
                 title="Delete"
+                aria-label="Delete loan application"
               >
                 🗑
               </button>
