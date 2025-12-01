@@ -102,6 +102,7 @@ function formatDate(isoDate: string): string {
                 ⚡
               </button>
               <button
+                v-if="loan.status === 'pending'"
                 class="action-btn danger"
                 @click="handleDelete(loan.id)"
                 title="Delete"

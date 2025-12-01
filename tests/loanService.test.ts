@@ -360,7 +360,7 @@ describe('loanService', () => {
       expect(remaining[0]?.id).toBe('loan-2')
     })
 
-    it('deletes the correct loan from multiple loans', () => {
+    it('deletes middle loan and preserves remaining loans', () => {
       const loans: LoanApplication[] = [
         {
           id: 'loan-1',
