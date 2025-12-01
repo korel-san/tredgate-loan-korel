@@ -29,8 +29,64 @@ jobs:
       - name: Run linter
         run: npm run lint
 
-      - name: Run tests
-        run: npm run test
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+          retention-days: 30
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Generate test summary
+        if: always()
+        run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Extract test results from JSON
+          if [ -f test-results/results.json ]; then
+            TOTAL_TESTS=$(jq '.numTotalTests' test-results/results.json)
+            PASSED_TESTS=$(jq '.numPassedTests' test-results/results.json)
+            FAILED_TESTS=$(jq '.numFailedTests' test-results/results.json)
+            TEST_SUITES=$(jq '.numTotalTestSuites' test-results/results.json)
+            PASSED_SUITES=$(jq '.numPassedTestSuites' test-results/results.json)
+            
+            echo "### 📊 Test Statistics" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Test Suites Passed | $PASSED_SUITES / $TEST_SUITES |" >> $GITHUB_STEP_SUMMARY
+            echo "| Tests Passed | $PASSED_TESTS / $TOTAL_TESTS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Tests Failed | $FAILED_TESTS |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            
+            if [ "$FAILED_TESTS" -eq 0 ]; then
+              echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ Some tests failed. Check the logs for details." >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📈 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Coverage reports are available in the artifacts." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **test-results**: HTML test report and JSON results" >> $GITHUB_STEP_SUMMARY
+          echo "- **coverage-report**: HTML coverage report" >> $GITHUB_STEP_SUMMARY
 
       - name: Build
         run: npm run build
