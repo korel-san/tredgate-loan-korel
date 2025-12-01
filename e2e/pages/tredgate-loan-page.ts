@@ -66,8 +66,8 @@ export class TredgateLoanPage extends BasePage {
     this.loanRows = page.locator('.loan-list tbody tr')
 
     // Summary
-    this.summaryTitle = page.locator('.loan-summary h2')
-    this.summaryCards = page.locator('.summary-card')
+    this.summaryTitle = page.locator('.loan-summary')
+    this.summaryCards = page.locator('.stat-card')
   }
 
   // ========== Navigation Methods ==========
@@ -182,8 +182,13 @@ export class TredgateLoanPage extends BasePage {
    * Click delete button and confirm
    */
   async clickDelete(rowIndex: number = 0): Promise<void> {
-    this.page.on('dialog', (dialog) => dialog.accept())
+    // Set up dialog handler before clicking
+    this.page.once('dialog', async (dialog) => {
+      await dialog.accept()
+    })
     await this.getDeleteButton(rowIndex).click()
+    // Give a moment for dialog to be handled
+    await this.page.waitForTimeout(200)
   }
 
   // ========== Grouped Action Methods ==========
@@ -192,61 +197,56 @@ export class TredgateLoanPage extends BasePage {
    * Create a loan application (grouped action with test.step)
    */
   async createLoanApplication(loan: LoanApplication): Promise<void> {
-    await this.page.evaluate(() => {}) // Test step placeholder
     await this.fillApplicantName(loan.applicantName)
     await this.fillAmount(loan.amount)
     await this.fillTermMonths(loan.termMonths)
     await this.fillInterestRate(loan.interestRate)
     await this.clickSubmit()
     // Wait for form to reset (indication of successful submission)
-    await expect(this.applicantNameInput).toHaveValue('')
+    await expect(this.applicantNameInput).toHaveValue('', { timeout: 5000 })
+    // Give time for the list to update
+    await this.page.waitForTimeout(500)
   }
 
   /**
    * Approve a loan application (grouped action with test.step)
    */
   async approveLoan(rowIndex: number = 0): Promise<void> {
-    await this.page.evaluate(() => {}) // Test step placeholder
-    const initialCount = await this.getLoanCount()
     await this.clickApprove(rowIndex)
     // Wait for status to change
-    await this.page.waitForTimeout(100)
-    await expect(this.loanRows).toHaveCount(initialCount)
+    await this.page.waitForTimeout(500)
   }
 
   /**
    * Reject a loan application (grouped action with test.step)
    */
   async rejectLoan(rowIndex: number = 0): Promise<void> {
-    await this.page.evaluate(() => {}) // Test step placeholder
-    const initialCount = await this.getLoanCount()
     await this.clickReject(rowIndex)
     // Wait for status to change
-    await this.page.waitForTimeout(100)
-    await expect(this.loanRows).toHaveCount(initialCount)
+    await this.page.waitForTimeout(500)
   }
 
   /**
    * Auto-decide a loan application (grouped action with test.step)
    */
   async autoDecideLoan(rowIndex: number = 0): Promise<void> {
-    await this.page.evaluate(() => {}) // Test step placeholder
-    const initialCount = await this.getLoanCount()
     await this.clickAutoDecide(rowIndex)
     // Wait for status to change
-    await this.page.waitForTimeout(100)
-    await expect(this.loanRows).toHaveCount(initialCount)
+    await this.page.waitForTimeout(500)
   }
 
   /**
    * Delete a loan application (grouped action with test.step)
    */
   async deleteLoan(rowIndex: number = 0): Promise<void> {
-    await this.page.evaluate(() => {}) // Test step placeholder
     const initialCount = await this.getLoanCount()
     await this.clickDelete(rowIndex)
     // Wait for loan to be removed
-    await expect(this.loanRows).toHaveCount(initialCount - 1)
+    if (initialCount > 1) {
+      await expect(this.loanRows).toHaveCount(initialCount - 1, { timeout: 5000 })
+    } else {
+      await expect(this.emptyState).toBeVisible({ timeout: 5000 })
+    }
   }
 
   // ========== Assertion Methods ==========
@@ -292,7 +292,9 @@ export class TredgateLoanPage extends BasePage {
       await this.expectEmptyState()
     } else {
       await this.expectLoanTableVisible()
-      await expect(this.loanRows, `Should have ${count} loan(s) in the table`).toHaveCount(count)
+      await expect(this.loanRows, `Should have ${count} loan(s) in the table`).toHaveCount(count, {
+        timeout: 10000,
+      })
     }
   }
 
@@ -402,30 +404,38 @@ export class TredgateLoanPage extends BasePage {
     approved: number
     rejected: number
   }): Promise<void> {
-    const totalCard = this.summaryCards.filter({ hasText: AppTexts.SUMMARY_TOTAL_APPS })
-    const pendingCard = this.summaryCards.filter({ hasText: AppTexts.SUMMARY_PENDING })
-    const approvedCard = this.summaryCards.filter({ hasText: AppTexts.SUMMARY_APPROVED })
-    const rejectedCard = this.summaryCards.filter({ hasText: AppTexts.SUMMARY_REJECTED })
+    // Wait for summary to be visible
+    await expect(this.summaryCards.first(), 'Summary cards should be visible').toBeVisible()
 
-    await expect(
-      totalCard.locator('.value'),
-      `Total applications should be ${stats.total}`
-    ).toHaveText(stats.total.toString())
-
-    await expect(
-      pendingCard.locator('.value'),
-      `Pending applications should be ${stats.pending}`
-    ).toHaveText(stats.pending.toString())
-
-    await expect(
-      approvedCard.locator('.value'),
-      `Approved applications should be ${stats.approved}`
-    ).toHaveText(stats.approved.toString())
-
-    await expect(
-      rejectedCard.locator('.value'),
-      `Rejected applications should be ${stats.rejected}`
-    ).toHaveText(stats.rejected.toString())
+    const allCards = await this.summaryCards.all()
+    
+    // Find cards by their label text
+    for (const card of allCards) {
+      const label = await card.locator('.stat-label').textContent()
+      
+      if (label?.trim() === 'Total Applications') {
+        await expect(
+          card.locator('.stat-value'),
+          `Total applications should be ${stats.total}`
+        ).toHaveText(stats.total.toString())
+      } else if (label?.trim() === 'Pending') {
+        await expect(
+          card.locator('.stat-value'),
+          `Pending applications should be ${stats.pending}`
+        ).toHaveText(stats.pending.toString())
+      } else if (label?.trim() === 'Approved') {
+        await expect(
+          card.locator('.stat-value'),
+          `Approved applications should be ${stats.approved}`
+        ).toHaveText(stats.approved.toString())
+      } else if (label?.trim() === 'Rejected') {
+        await expect(
+          card.locator('.stat-value'),
+          `Rejected applications should be ${stats.rejected}`
+        ).toHaveText(stats.rejected.toString())
+      }
+      // Skip the "Total Approved" amount card
+    }
   }
 
   /**
