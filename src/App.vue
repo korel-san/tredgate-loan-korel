@@ -46,13 +46,13 @@ onMounted(() => {
     </header>
 
     <div class="dashboard-container">
-      <LoanSummary :loans="loans" />
 
       <main class="main-content">
         <div class="column-left">
           <LoanForm @created="refreshLoans" />
         </div>
         <div class="column-right">
+          <LoanSummary :loans="loans" />
           <LoanList
             :loans="loans"
             @approve="handleApprove"
