@@ -57,9 +57,9 @@ When reviewing code or features, you MUST check:
 3. Use atomic methods and grouped actions method in the Page Objects
 4. Test.steps are only in the grouped methods in Page Objects
 5. Tests are clear, readable, reusable, deterministic and isolated from others
-6. For texts use library of texts, no hardcoding to the tests and Page Objects
+6. For texts, use a centralized text constants file or localization/translation files; do not hardcode texts in tests or Page Objects
 7. No logic is placed directly in the tests, use helper folders
 8. All expects have custom messages for good readability and easy debugging
 9. All expects are inside the Page Objects
-10. Locators are based on unique identifiers. If there is no usable, choose alternative and write unstable elements to the comments to fix it in the future
+10. Locators are based on unique identifiers. If there are no usable unique identifiers, choose alternative and write unstable elements to the comments to fix it in the future
 
