@@ -38,7 +38,7 @@ jobs:
         if: steps.run-tests.outcome == 'failure'
         run: |
           echo "TEST_LOG<<EOF" >> $GITHUB_ENV
-          tail -100 test-output.log >> $GITHUB_ENV
+          cat test-output.log >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create Copilot healing issue
