@@ -1,5 +1,4 @@
-import { test, expect } from './fixtures/test-fixtures'
-import { AppTexts } from './texts/app-texts'
+import { test } from './fixtures/test-fixtures'
 
 /**
  * Loan Creation Tests
