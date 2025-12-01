@@ -23,6 +23,7 @@ Tredgate Loan is a frontend-only demo application used for training on GitHub Co
 - **TypeScript** - Type-safe JavaScript
 - **Vite** - Fast build tool and dev server
 - **Vitest** - Unit testing framework
+- **Playwright** - End-to-end testing framework
 - **ESLint** - Code linting
 
 ## Getting Started
@@ -64,9 +65,25 @@ npm run test:coverage
 
 # Open interactive test UI
 npm run test:ui
+
+# Run E2E tests with Playwright
+npm run test:e2e
+
+# Run E2E tests with UI mode
+npm run test:e2e:ui
+
+# Run E2E tests in headed mode (visible browser)
+npm run test:e2e:headed
+
+# Debug E2E tests
+npm run test:e2e:debug
+
+# View Playwright test report
+npm run playwright:report
 ```
 
 See [TEST_DOCUMENTATION.md](TEST_DOCUMENTATION.md) for comprehensive testing guide.
+See [e2e/README.md](e2e/README.md) for E2E testing documentation.
 
 ### Linting
 
@@ -76,7 +93,8 @@ npm run lint
 
 ## Test Coverage
 
-The project has comprehensive test coverage:
+### Unit Tests
+The project has comprehensive unit test coverage:
 - **77 unit tests** across all components and services
 - **99%+ code coverage** (statements, branches, functions)
 - Tests for LoanForm, LoanList, LoanSummary components
@@ -84,6 +102,16 @@ The project has comprehensive test coverage:
 
 Test reports are generated in HTML and JSON formats in the `test-results/` directory.
 Coverage reports are available in the `coverage/` directory.
+
+### E2E Tests
+The project includes end-to-end tests using Playwright:
+- **42 E2E tests** covering core user journeys
+- Tests for loan creation, approval, rejection, auto-decide, and deletion workflows
+- Summary statistics validation
+- Page Object Model architecture for maintainability
+
+E2E test documentation is available in the [e2e/README.md](e2e/README.md) file.
+Playwright reports are generated in the `playwright-report/` directory.
 
 ## Project Structure
 
