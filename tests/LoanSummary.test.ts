@@ -213,10 +213,11 @@ describe('LoanSummary', () => {
   })
 
   it('calculates stats for large numbers correctly', () => {
+    const statuses = ['approved', 'pending', 'rejected'];
     const loans = Array.from({ length: 100 }, (_, i) => 
       createMockLoan({ 
         id: `loan-${i}`, 
-        status: i % 3 === 0 ? 'approved' : i % 3 === 1 ? 'pending' : 'rejected',
+        status: statuses[i % statuses.length],
         amount: 10000
       })
     )
