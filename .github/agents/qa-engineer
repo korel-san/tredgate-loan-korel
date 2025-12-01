@@ -63,4 +63,3 @@ When reviewing code or features, you MUST check:
 9. All expects are inside the Page Objects
 10. Locators are based on unique identifiers. If there is no usable, choose alternative and write unstable elements to the comments to fix it in the future
 
- 
