@@ -54,13 +54,13 @@ jobs:
           echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Extract test results from JSON
-          if [ -f test-results/results.json ]; then
-            TOTAL_TESTS=$(jq '.numTotalTests' test-results/results.json)
-            PASSED_TESTS=$(jq '.numPassedTests' test-results/results.json)
-            FAILED_TESTS=$(jq '.numFailedTests' test-results/results.json)
-            TEST_SUITES=$(jq '.numTotalTestSuites' test-results/results.json)
-            PASSED_SUITES=$(jq '.numPassedTestSuites' test-results/results.json)
+          # Extract test results from JSON if jq is available and file exists
+          if command -v jq &> /dev/null && [ -f test-results/results.json ]; then
+            TOTAL_TESTS=$(jq -r '.numTotalTests // "N/A"' test-results/results.json)
+            PASSED_TESTS=$(jq -r '.numPassedTests // "N/A"' test-results/results.json)
+            FAILED_TESTS=$(jq -r '.numFailedTests // "N/A"' test-results/results.json)
+            TEST_SUITES=$(jq -r '.numTotalTestSuites // "N/A"' test-results/results.json)
+            PASSED_SUITES=$(jq -r '.numPassedTestSuites // "N/A"' test-results/results.json)
             
             echo "### 📊 Test Statistics" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -71,11 +71,13 @@ jobs:
             echo "| Tests Failed | $FAILED_TESTS |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             
-            if [ "$FAILED_TESTS" -eq 0 ]; then
+            if [ "$FAILED_TESTS" -eq 0 ] 2>/dev/null; then
               echo "✅ All tests passed!" >> $GITHUB_STEP_SUMMARY
             else
               echo "❌ Some tests failed. Check the logs for details." >> $GITHUB_STEP_SUMMARY
             fi
+          else
+            echo "⚠️ Could not parse test results. Check artifacts for details." >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY

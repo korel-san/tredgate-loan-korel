@@ -133,7 +133,8 @@ describe('LoanList', () => {
       props: { loans: [mockLoans[0]!] }
     })
     
-    // monthly = (50000 * 1.08) / 24 = 2250
+    // Verify monthly payment is calculated and displayed correctly
+    // Formula: (amount * (1 + interestRate)) / termMonths
     const paymentCell = wrapper.findAll('tbody td')[4]
     expect(paymentCell?.text()).toBe('$2,250.00')
   })

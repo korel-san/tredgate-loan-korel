@@ -228,7 +228,7 @@ describe('LoanSummary', () => {
     const values = wrapper.findAll('.stat-value')
     expect(values[0]?.text()).toBe('100')
     
-    // Count of each status: approved = 34, pending = 33, rejected = 33
+    // Calculate expected counts based on loan distribution
     const approvedCount = loans.filter(l => l.status === 'approved').length
     const pendingCount = loans.filter(l => l.status === 'pending').length
     const rejectedCount = loans.filter(l => l.status === 'rejected').length
