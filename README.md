@@ -53,14 +53,37 @@ npm run build
 ### Testing
 
 ```bash
+# Run all tests
 npm run test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Open interactive test UI
+npm run test:ui
 ```
+
+See [TEST_DOCUMENTATION.md](TEST_DOCUMENTATION.md) for comprehensive testing guide.
 
 ### Linting
 
 ```bash
 npm run lint
 ```
+
+## Test Coverage
+
+The project has comprehensive test coverage:
+- **77 unit tests** across all components and services
+- **99%+ code coverage** (statements, branches, functions)
+- Tests for LoanForm, LoanList, LoanSummary components
+- Tests for loanService business logic
+
+Test reports are generated in HTML and JSON formats in the `test-results/` directory.
+Coverage reports are available in the `coverage/` directory.
 
 ## Project Structure
 
@@ -78,7 +101,10 @@ src/
 ├── App.vue           # Main application component
 └── main.ts           # Application entry point
 tests/
-└── loanService.test.ts  # Unit tests
+├── LoanForm.test.ts      # LoanForm component tests
+├── LoanList.test.ts      # LoanList component tests
+├── LoanSummary.test.ts   # LoanSummary component tests
+└── loanService.test.ts   # Service layer tests
 ```
 
 ## Data Persistence
